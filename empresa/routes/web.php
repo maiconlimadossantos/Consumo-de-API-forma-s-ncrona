@@ -6,4 +6,4 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/indicadores', [App\Http\Controllers\IndicadorController::class, 'index'])->name('indicadores');
+Route::get('/painel-exportacao', [App\Http\Controllers\PainelExportacaoController::class, 'exibirPainel'])->name('painel.exportacao');

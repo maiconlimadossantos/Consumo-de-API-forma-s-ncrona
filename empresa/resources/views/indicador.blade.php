@@ -1,21 +1,21 @@
-<div class="container mx-auto p-6">
-    <h1 class="text-2xl font-bold mb-4">Painel Exportação - Camaquã/RS</h1>
+<div class="p-6 bg-gray-100 min-h-screen">
+    <h1 class="text-xl font-bold mb-6">Indicadores Econômicos - Exportadora Camaquã</h1>
 
     @if($erro)
-        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative">
-            <strong class="font-bold">Atenção:</strong>
-            <span class="block sm:inline">{{ $erro }}</span>
+        <div class="bg-red-500 text-white p-4 rounded shadow">
+            <strong>Atenção:</strong> {{ $erro }}
         </div>
     @else
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            @foreach($indicadores as $moeda)
-                <div class="border rounded-lg p-4 shadow-sm bg-white">
-                    <h2 class="text-xl font-semibold">{{ $moeda['name'] }}</h2>
-                    <p class="text-3xl font-bold text-green-600">
-                        R$ {{ number_format($moeda['bid'], 2, ',', '.') }}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            @foreach($indicadores as $item)
+                <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-green-500">
+                    <h2 class="text-gray-600 font-semibold">{{ $item['name'] }}</h2>
+                    <p class="text-3xl font-bold text-gray-800">
+                        R$ {{ number_format($item['bid'], 2, ',', '.') }}
                     </p>
-                    <p class="text-sm text-gray-500">Variação: {{ $moeda['pctChange'] }}%</p>
-                    <p class="text-xs text-gray-400 italic">Atualizado em: {{ $moeda['create_date'] }}</p>
+                    <span class="text-{{ $item['pctChange'] > 0 ? 'green' : 'red' }}-600">
+                        Variação: {{ $item['pctChange'] }}%
+                    </span>
                 </div>
             @endforeach
         </div>

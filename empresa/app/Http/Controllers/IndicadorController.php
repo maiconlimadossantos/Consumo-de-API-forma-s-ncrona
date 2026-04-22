@@ -2,35 +2,44 @@
 
 namespace App\Http\Controllers;
 
-
-
-namespace App\Http\Controllers;
-
 use Illuminate\Support\Facades\Http;
-use Illuminate\View\View;
+use App\Models\Cotacao;
 use Exception;
 
-class IndicadorController extends Controller
+class PainelExportacaoController extends Controller
 {
-    public function index(): View
+    public function exibirPainel()
     {
         $url = "https://economia.awesomeapi.com.br/last/USD-BRL,EUR-BRL";
-        $indicadores = [];
-        $erro = null;
+        $dadosMoedas = [];
+        $mensagemErro = null;
 
         try {
-            // Consumo síncrono: O PHP espera a resposta antes de prosseguir
+            // Requisição síncrona com timeout de 5 segundos para evitar travamento infinito
             $response = Http::timeout(5)->get($url);
 
             if ($response->successful()) {
-                $indicadores = $response->json();
+                $dadosMoedas = $response->json();
+
+                // Salva no histórico (Model/Migração) para auditoria da empresa
+                foreach ($dadosMoedas as $moeda) {
+                    Cotacao::create([
+                        'moeda' => $moeda['code'],
+                        'preco' => $moeda['bid'],
+                        'variacao' => $moeda['pctChange'],
+                        'data_consulta' => now(),
+                    ]);
+                }
             } else {
-                $erro = "Não foi possível recuperar os dados da AwesomeAPI no momento.";
+                $mensagemErro = "Servidor de cotações retornou um erro inesperado.";
             }
         } catch (Exception $e) {
-            $erro = "Erro de conexão: O servidor de cotações está indisponível.";
+            $mensagemErro = "Falha na conexão externa. Verifique a rede ou tente novamente mais tarde.";
         }
 
-        return view('painel.indicadores', compact('indicadores', 'erro'));
+        return view('exportadora.painel', [
+            'indicadores' => $dadosMoedas,
+            'erro' => $mensagemErro
+        ]);
     }
 }
